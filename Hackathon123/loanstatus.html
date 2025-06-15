@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Status Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --approved: #2ecc71;
+            --pending: #f39c12;
+            --rejected: #e74c3c;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            padding: 20px;
+            border-bottom: none;
+        }
+        
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .badge-approved {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: var(--approved);
+        }
+        
+        .badge-pending {
+            background-color: rgba(243, 156, 18, 0.15);
+            color: var(--pending);
+        }
+        
+        .badge-rejected {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: var(--rejected);
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 20px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            height: calc(100% - 10px);
+            width: 2px;
+            background: #e0e0e0;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--primary);
+        }
+        
+        .timeline-item.completed::before {
+            background: var(--primary);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .status-card {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .status-card.approved {
+            border-left-color: var(--approved);
+        }
+        
+        .status-card.pending {
+            border-left-color: var(--pending);
+        }
+        
+        .status-card.rejected {
+            border-left-color: var(--rejected);
+        }
+        
+        .status-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .progress-bar {
+            transition: width 1.5s ease;
+        }
+        
+        .status-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .status-icon.approved {
+            color: var(--approved);
+        }
+        
+        .status-icon.pending {
+            color: var(--pending);
+        }
+        
+        .status-icon.rejected {
+            color: var(--rejected);
+        }
+        
+        .application-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .application-card:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card mb-5">
+                    <div class="card-header text-center">
+                        <h2><i class="fas fa-file-contract me-2"></i>Application Status Tracker</h2>
+                        <p class="mb-0">Track the status of your submitted applications in real-time</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="fas fa-user-circle fa-3x text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="mb-0">Martin Ndebele</h4>
+                                        <p class="text-muted mb-0">Application ID: APP-2023-0582</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                <span class="status-badge badge-approved">Active Applicant</span>
+                                <p class="text-muted mt-2 mb-0">Last updated: <span id="update-time">Today, 10:45 AM</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-5">
+                            <h3 class="mb-4">Your Application Progress</h3>
+                            <div class="progress">
+                                <div id="status-progress" class="progress-bar bg-success" role="progressbar" style="width: 65%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span>Submitted</span>
+                                <span>Under Review</span>
+                                <span>Completed</span>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-4">
+                            <button id="statusButton" class="btn btn-primary btn-lg pulse">
+                                <i class="fas fa-sync-alt me-2"></i>Check Current Status
+                            </button>
+                        </div>
+                        
+                        <div id="status-container" class="row mt-4">
+                            <!-- Status cards will be loaded here -->
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Application Timeline</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="timeline">
+                                    <div class="timeline-item completed">
+                                        <h6>Application Submitted</h6>
+                                        <p class="text-muted mb-1">June 10, 2023 - 09:30 AM</p>
+                                        <p>Your application was successfully submitted.</p>
+                                    </div>
+                                    <div class="timeline-item completed">
+                                        <h6>Initial Review</h6>
+                                        <p class="text-muted mb-1">June 12, 2023 - 02:15 PM</p>
+                                        <p>Application passed initial screening.</p>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <h6>Detailed Evaluation</h6>
+                                        <p class="text-muted mb-1">In progress</p>
+                                        <p>Your application is currently under review by our team.</p>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <h6>Final Decision</h6>
+                                        <p class="text-muted mb-1">Pending</p>
+                                        <p>Decision will be communicated once review is complete.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <h3><i class="fas fa-folder-open me-2"></i>Your Applications</h3>
+                    <p class="text-muted">View all your submitted applications</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card application-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="status-badge badge-pending">In Review</span>
+                                    <span class="text-muted">APP-2023-0582</span>
+                                </div>
+                                <h5>Business Loan Application</h5>
+                                <p class="text-muted">Submitted: June 10, 2023</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-clock text-warning me-2"></i>
+                                        <span>Processing</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card application-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="status-badge badge-approved">Approved</span>
+                                    <span class="text-muted">APP-2023-0415</span>
+                                </div>
+                                <h5>Credit Card Application</h5>
+                                <p class="text-muted">Submitted: May 28, 2023</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                        <span>Completed</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card application-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="status-badge badge-rejected">Declined</span>
+                                    <span class="text-muted">APP-2023-0328</span>
+                                </div>
+                                <h5>Mortgage Application</h5>
+                                <p class="text-muted">Submitted: May 15, 2023</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-times-circle text-danger me-2"></i>
+                                        <span>Closed</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusButton = document.getElementById('statusButton');
+            const statusContainer = document.getElementById('status-container');
+            const progressBar = document.getElementById('status-progress');
+            const updateTime = document.getElementById('update-time');
+            
+            // Sample status data
+            const statuses = [
+                {
+                    status: "Pending",
+                    title: "Application Under Review",
+                    description: "Your application is currently being reviewed by our team. This process typically takes 3-5 business days.",
+                    icon: "fas fa-hourglass-half",
+                    date: "Last update: Today, 10:45 AM"
+                },
+                {
+                    status: "Approved",
+                    title: "Credit Check Completed",
+                    description: "Your credit history has been successfully verified and meets our requirements.",
+                    icon: "fas fa-check-circle",
+                    date: "Completed: June 12, 2023"
+                },
+                {
+                    status: "Rejected",
+                    title: "Document Verification Needed",
+                    description: "We need additional documents to verify your income. Please upload your recent pay stubs.",
+                    icon: "fas fa-exclamation-circle",
+                    date: "Action required: June 8, 2023"
+                }
+            ];
+            
+            // Function to update status display
+            function updateStatusDisplay() {
+                statusContainer.innerHTML = '';
+                
+                statuses.forEach(item => {
+                    const statusCard = document.createElement('div');
+                    statusCard.className = `col-md-4 mb-4 fade-in`;
+                    statusCard.innerHTML = `
+                        <div class="card status-card h-100 ${item.status.toLowerCase()}">
+                            <div class="card-body text-center">
+                                <div class="status-icon ${item.status.toLowerCase()}">
+                                    <i class="${item.icon}"></i>
+                                </div>
+                                <span class="status-badge badge-${item.status.toLowerCase()}">${item.status}</span>
+                                <h5 class="mt-3">${item.title}</h5>
+                                <p>${item.description}</p>
+                                <p class="text-muted small mb-0">${item.date}</p>
+                            </div>
+                        </div>
+                    `;
+                    statusContainer.appendChild(statusCard);
+                });
+                
+                // Update progress bar
+                progressBar.style.width = '65%';
+                progressBar.textContent = '65% Complete';
+                
+                // Update time
+                const now = new Date();
+                updateTime.textContent = `Today, ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                
+                // Add animation to button
+                statusButton.classList.add('pulse');
+                setTimeout(() => {
+                    statusButton.classList.remove('pulse');
+                }, 2000);
+            }
+            
+            // Initial status display
+            updateStatusDisplay();
+            
+            // Button click event
+            statusButton.addEventListener('click', function() {
+                // Show loading state
+                const originalText = statusButton.innerHTML;
+                statusButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Checking Status...';
+                statusButton.disabled = true;
+                
+                // Simulate API call
+                setTimeout(() => {
+                    // Update status display
+                    updateStatusDisplay();
+                    
+                    // Restore button
+                    statusButton.innerHTML = originalText;
+                    statusButton.disabled = false;
+                    
+                    // Show notification
+                    const toast = document.createElement('div');
+                    toast.className = 'position-fixed bottom-0 end-0 p-3';
+                    toast.style.zIndex = '11';
+                    toast.innerHTML = `
+                        <div id="status-toast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header bg-success text-white">
+                                <strong class="me-auto"><i class="fas fa-check-circle me-2"></i>Status Updated</strong>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                Your application status has been refreshed successfully.
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(toast);
+                    
+                    // Auto-remove toast
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 3000);
+                }, 1500);
+            });
+            
+            // Add hover effect to application cards
+            document.querySelectorAll('.application-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

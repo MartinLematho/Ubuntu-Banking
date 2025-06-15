@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stokvel Finder | Finvest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --success: #2ec4b6;
+            --danger: #e71d36;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --sidebar-bg: #2c3e50;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            background-color: #f0f5ff;
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--secondary);
+            font-size: 1.8rem;
+        }
+
+        .logo h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .page-title {
+            text-align: center;
+            margin: 40px 0 30px;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .page-title p {
+            color: var(--gray);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .dashboard {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .search-section {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+        }
+
+        .search-section h2 {
+            margin-bottom: 20px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border-radius: 30px;
+            border: 2px solid #e0e0e0;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .stokvel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .stokvel-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            border: 1px solid #eee;
+        }
+
+        .stokvel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: var(--gradient);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card-header h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .card-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .stokvel-details {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .stokvel-details li {
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .stokvel-details li:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 600;
+        }
+
+        .card-footer {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .preference-form {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .preference-form h2 {
+            margin-bottom: 25px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .ai-results {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-top: 30px;
+            display: none;
+        }
+
+        .ai-results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .ai-results-header h2 {
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-chip {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .ai-recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .ai-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .ai-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .ai-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .ai-match {
+            background: var(--success);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .ai-card h3 {
+            font-size: 1.4rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .ai-card p {
+            color: var(--gray);
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .ai-features {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .ai-features li {
+            padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .ai-features li i {
+            color: var(--success);
+            margin-top: 5px;
+        }
+
+        .ai-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .members {
+            display: flex;
+            align-items: center;
+        }
+
+        .member-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: -10px;
+            border: 2px solid white;
+        }
+
+        .member-count {
+            margin-left: 15px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        @media (max-width: 992px) {
+            .dashboard {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .page-title h1 {
+                font-size: 2rem;
+            }
+            
+            .stokvel-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ai-recommendations {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="page-title">
+            <h1>Find Your Perfect Stokvel</h1>
+            <p>Join a community that matches your financial goals and preferences. Our AI will help you find the best fit.</p>
+        </div>
+
+        <div class="dashboard">
+            <div class="search-section">
+                <h2><i class="fas fa-search"></i> Search Existing Stokvels</h2>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="stokvelSearch" placeholder="Search stokvels by name...">
+                </div>
+                
+                <h3>Popular Stokvels</h3>
+                <div class="stokvel-grid">
+                    <!-- Stokvel Card 1 -->
+                    <div class="stokvel-card">
+                        <div class="card-header">
+                            <h3>Savings Circle</h3>
+                            <p>Monthly savings group</p>
+                        </div>
+                        <div class="card-body">
+                            <ul class="stokvel-details">
+                                <li>
+                                    <span class="detail-label">Type:</span>
+                                    <span class="detail-value">Savings</span>
+                                </li>
+                                <li>
+                                    <span class="detail-label">Contribution:</span>
+                                    <span class="detail-value">P 500/month</span>
+                                </li>
+                                <li>
+                                    <span class="detail-label">Members:</span>
+                                    <span class="detail-value">12</span>
+                                </li>
+                                <li>
+                                    <span class="detail-label">Established:</span>
+                                    <span class="detail-value">2020</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary">View Details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Stokvel Card 2 -->
+                    <div class="stokvel-card">
+                        <div class="card-header" style="background: linear-gradient(135deg, #2ec4b6 0%, #3a0ca3 100%);">
+                            <h3>Investment Group</h3>
+                            <p>Growing wealth together</p>
+                        </div>
+                        <div class="card-body">
+                            <ul class="stokvel-details">
+                                <li>
+                                    <span class="detail-label">Type:</span>
+                                    <span class="detail-value">Investment</span>
+                                </li>
+                                <li>
+                                    <span class="detail-label">Contribution:</span>
+                                    <span class="detail-value">P 1000/month</span>
+                                </li>
+                                <li>
+                                    <span class="detail-label">Members:</span>
+                                    <span class="detail-value">8</span>
+                                </li>
+                                <li>
+                                    <span class="detail-label">Established:</span>
+                                    <span class="detail-value">2019</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preference-form">
+                <h2><i class="fas fa-clipboard-list"></i> Tell Us Your Preferences</h2>
+                <form id="stokvelForm">
+                    <div class="form-group">
+                        <label for="stokvelType">What type of stokvel are you interested in?</label>
+                        <select id="stokvelType" class="form-control" required>
+                            <option value="">Select stokvel type</option>
+                            <option value="savings">Savings Stokvel</option>
+                            <option value="investment">Investment Stokvel</option>
+                            <option value="funeral">Funeral Stokvel</option>
+                            <option value="grocery">Grocery Stokvel</option>
+                            <option value="rotational">Rotational Savings</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contribution">What monthly contribution are you comfortable with?</label>
+                        <select id="contribution" class="form-control" required>
+                            <option value="">Select contribution range</option>
+                            <option value="0-500">P 0 - P 500</option>
+                            <option value="500-1000">P 500 - P 1,000</option>
+                            <option value="1000-2000">P 1,000 - P 2,000</option>
+                            <option value="2000+">P 2,000+</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="frequency">How often would you like to contribute?</label>
+                        <select id="frequency" class="form-control" required>
+                            <option value="">Select frequency</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="fortnightly">Fortnightly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goals">What are your main financial goals? (Select all that apply)</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goal1" name="goals" value="savings">
+                                <label for="goal1">Build savings</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goal2" name="goals" value="investment">
+                                <label for="goal2">Long-term investment</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goal3" name="goals" value="emergency">
+                                <label for="goal3">Emergency fund</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goal4" name="goals" value="retirement">
+                                <label for="goal4">Retirement planning</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goal5" name="goals" value="education">
+                                <label for="goal5">Education fund</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="goal6" name="goals" value="property">
+                                <label for="goal6">Property purchase</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="preferredSize">What size stokvel group do you prefer?</label>
+                        <select id="preferredSize" class="form-control" required>
+                            <option value="">Select group size</option>
+                            <option value="small">Small (5-10 members)</option>
+                            <option value="medium">Medium (11-20 members)</option>
+                            <option value="large">Large (21+ members)</option>
+                            <option value="no-preference">No preference</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="meetingType">Preferred meeting format:</label>
+                        <select id="meetingType" class="form-control" required>
+                            <option value="">Select meeting type</option>
+                            <option value="in-person">In-person meetings</option>
+                            <option value="online">Online meetings</option>
+                            <option value="hybrid">Hybrid (both in-person and online)</option>
+                            <option value="no-meetings">No regular meetings</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="additional">Additional preferences or requirements:</label>
+                        <textarea id="additional" class="form-control" placeholder="Tell us anything else that's important to you..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                            <i class="fas fa-search"></i> Find My Stokvel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="ai-results" id="aiResults">
+            <div class="ai-results-header">
+                <h2><i class="fas fa-robot"></i> AI-Powered Recommendations</h2>
+                <div class="ai-chip">Smart Matching Technology</div>
+            </div>
+            
+            <div class="ai-recommendations">
+                <!-- AI Recommendation 1 -->
+                <div class="ai-card">
+                    <div class="ai-card-header">
+                        <h3>Wealth Builders Group</h3>
+                        <div class="ai-match">94% Match</div>
+                    </div>
+                    <p>A diversified investment-focused stokvel with a proven track record of 12% average annual returns.</p>
+                    
+                    <ul class="ai-features">
+                        <li><i class="fas fa-check-circle"></i> Matches your investment goals</li>
+                        <li><i class="fas fa-check-circle"></i> Fits your contribution range</li>
+                        <li><i class="fas fa-check-circle"></i> Monthly online meetings</li>
+                    </ul>
+                    
+                    <div class="ai-card-footer">
+                        <div class="members">
+                            <div class="member-avatar">TN</div>
+                            <div class="member-avatar">NM</div>
+                            <div class="member-avatar">JS</div>
+                            <div class="member-count">+12 members</div>
+                        </div>
+                        <button class="btn btn-primary">Join Group</button>
+                    </div>
+                </div>
+                
+                <!-- AI Recommendation 2 -->
+                <div class="ai-card">
+                    <div class="ai-card-header">
+                        <h3>Community Savers Circle</h3>
+                        <div class="ai-match">87% Match</div>
+                    </div>
+                    <p>A savings-focused group with flexible contribution options and emergency fund support.</p>
+                    
+                    <ul class="ai-features">
+                        <li><i class="fas fa-check-circle"></i> Aligns with your savings goals</li>
+                        <li><i class="fas fa-check-circle"></i> Offers your preferred meeting format</li>
+                        <li><i class="fas fa-check-circle"></i> Ideal group size for you</li>
+                    </ul>
+                    
+                    <div class="ai-card-footer">
+                        <div class="members">
+                            <div class="member-avatar">LM</div>
+                            <div class="member-avatar">PB</div>
+                            <div class="member-avatar">KD</div>
+                            <div class="member-count">+8 members</div>
+                        </div>
+                        <button class="btn btn-primary">Join Group</button>
+                    </div>
+                </div>
+                
+                <!-- AI Recommendation 3 -->
+                <div class="ai-card">
+                    <div class="ai-card-header">
+                        <h3>Future Focus Investors</h3>
+                        <div class="ai-match">79% Match</div>
+                    </div>
+                    <p>Long-term investment group specializing in property and retirement planning.</p>
+                    
+                    <ul class="ai-features">
+                        <li><i class="fas fa-check-circle"></i> Matches your property goal</li>
+                        <li><i class="fas fa-check-circle"></i> Quarterly hybrid meetings</li>
+                        <li><i class="fas fa-check-circle"></i> Expert financial guidance</li>
+                    </ul>
+                    
+                    <div class="ai-card-footer">
+                        <div class="members">
+                            <div class="member-avatar">AB</div>
+                            <div class="member-avatar">RT</div>
+                            <div class="member-avatar">SG</div>
+                            <div class="member-count">+15 members</div>
+                        </div>
+                        <button class="btn btn-primary">Join Group</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stokvelForm = document.getElementById('stokvelForm');
+            const aiResults = document.getElementById('aiResults');
+            
+            stokvelForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading effect
+                const submitBtn = stokvelForm.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finding Your Stokvels...';
+                submitBtn.disabled = true;
+                
+                // Simulate AI processing
+                setTimeout(function() {
+                    // Show results
+                    aiResults.style.display = 'block';
+                    
+                    // Reset button
+                    submitBtn.innerHTML = '<i class="fas fa-search"></i> Find My Stokvel';
+                    submitBtn.disabled = false;
+                    
+                    // Scroll to results
+                    aiResults.scrollIntoView({ behavior: 'smooth' });
+                }, 2000);
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('stokvelSearch');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const cards = document.querySelectorAll('.stokvel-card');
+                
+                cards.forEach(card => {
+                    const title = card.querySelector('h3').textContent.toLowerCase();
+                    if (title.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Add join group button functionality
+        document.querySelectorAll('.ai-card-footer .btn-primary').forEach(button => {
+            button.addEventListener('click', function() {
+                const stokvelCard = this.closest('.ai-card');
+                const stokvelName = stokvelCard.querySelector('.ai-card-header h3').textContent.trim();
+                // Redirect to join.html page with stokvel name as query parameter
+                const encodedName = encodeURIComponent(stokvelName);
+                window.location.href = `join.html?stokvel=${encodedName}`;
+            });
+        });
+    </script>
+</body>
+</html>

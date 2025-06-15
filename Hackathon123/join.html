@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Join Stokvel | Finvest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f5ff;
+            color: #212529;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #3a0ca3;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        input[type="submit"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .stokvel-name {
+            font-weight: 700;
+            color: #4361ee;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Apply to Join Stokvel</h1>
+        <div class="stokvel-name" id="stokvelName">Loading stokvel...</div>
+        <form id="joinForm">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" placeholder="Your full name" required />
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="Your email address" required />
+
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" placeholder="Your phone number" required />
+
+            <label for="message">Why do you want to join this stokvel?</label>
+            <textarea id="message" name="message" rows="4" placeholder="Tell us more..." required></textarea>
+
+            <input type="submit" value="Submit Application" />
+        </form>
+    </div>
+
+    <script>
+        // Extract stokvel name from query parameter and display it
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const stokvelName = getQueryParam('stokvel');
+            const stokvelNameElem = document.getElementById('stokvelName');
+            if (stokvelName) {
+                stokvelNameElem.textContent = `Stokvel: ${decodeURIComponent(stokvelName)}`;
+            } else {
+                stokvelNameElem.textContent = 'Stokvel not specified';
+            }
+
+            const joinForm = document.getElementById('joinForm');
+            joinForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Application submitted! We will contact you soon.');
+                joinForm.reset();
+            });
+        });
+    </script>
+</body>
+</html>
